@@ -1,0 +1,403 @@
+//https://dbdiagram.io/d
+Table bank{
+  id int [pk, increment]
+  name varchar
+}
+
+Table bank_account{
+  id int [pk, increment]
+  bank_id int [ref: > bank.id]
+  CBU varchar
+  account_number varchar
+  alias varchar
+}
+
+Table company {
+  id int [pk, increment, unique]
+  CUIT varchar [unique]
+  country_code varchar [ref: < country.code]
+  legal_name varchar
+}
+
+
+Table person{
+  id int [pk, increment, ref: - employee.person_id]
+  name varchar
+  last_name varchar
+  birthday datetime
+  person_identity_id int [ref: < person_identity.id]
+}
+
+Table person_identity {
+   id int [pk, increment]
+   identNumber varchar
+   identity_type_id int [ref: < identity_type.id]
+   tramitNumber int
+ }
+
+Table identity_type {
+   id int [pk, increment]
+   type varchar
+   country_code varchar [ref: < country.code]
+ }
+
+Table User {
+  id int  [pk, increment]
+  person_id int [ref: < person.id]
+  profile_picture varchar
+}
+
+Table role_user{
+  user_id int [ref: < User.id]
+  role_id int [ref: < role.id]
+}
+
+Table role {
+  id int [pk,increment]
+  role varchar
+  permissions JSON
+}
+
+
+Table employee{
+  id int [pk, increment]
+  file_number varchar
+  person_id int
+  date_of_admition datetime
+  date_of_termination datetime
+  company_id int [ref: > company.id]
+  bank_account_id int [ref: > bank_account.id]
+}
+
+Table employment_contract{
+  job_position_id int [ref: - job_position.id]
+  collective_agreement_id int [ref: - collective_agreement.id]
+  workshift_id int [ref: - workshift.id]
+  job_category_id int [ref: - job_category.id]
+  company_client_id int [ref: > company_client.id]
+  start_date datetime
+  end_date datetime [null]
+  salary money
+  additional money
+  gross_salary money
+  reason_for_termination varchar [note: "se guarda la fecha de fin y el motivo, ultima pantalla"] //repensar si va en otra tabla
+
+   indexes {
+    (job_position_id,job_category_id, collective_agreement_id, company_client_id, start_date) [pk]
+  }
+}
+
+Table job_position{
+  id int [pk, increment]
+  name varchar
+  company_id int [ref: > company.id]
+}
+
+
+Table company_client {
+  id int [PK, increment]
+  company_id int [ref: > company.id]
+}
+
+Table cost_center {
+  id int [PK, increment]
+  name varchar
+}
+
+Table cost_center_branch {
+  cost_center_id int [ref: > cost_center.id]
+  branch_office_id int [ref: > branch_office.id]
+}
+
+Table cost_center_client_company {
+  cost_center_id int
+  company_client_id int
+}
+Ref: "cost_center_client_company"."cost_center_id" > "cost_center"."id"
+Ref: "cost_center_client_company"."company_client_id" > "company_client"."id"
+
+Table job_category{
+  id int [pk, increment]
+  name varchar
+  collective_agreement_id int
+}
+Ref: "job_category"."collective_agreement_id" > "collective_agreement"."id"
+
+Table collective_agreement{
+  id int [pk, increment]
+  name varchar
+  industry varchar
+}
+
+Table company_collective_agreement {
+ company_id int [ref: > company.id]
+ collective_agreement_id int [ref: > collective_agreement.id]
+}
+
+Table branch_office{
+  id int [pk, increment, ref:> shift_override.branch_office_id]
+  country_code varchar [null, ref: < country.code]
+  company_id int
+  name varchar
+  latitude decimal //repensar en función de la geoloc
+  longitude decimal
+
+}
+
+Table punch_card{
+  id int [pk, increment]
+  punch_card_type_id int
+  employee_id int [ref: < employee.id]
+  branch_office_id int [ref: < branch_office.id]
+  movement_timestamp datetime [default: `now()`]
+  latitude decimal //en función de el geoloc
+  longitude decimal
+  observations text
+}
+
+Table punch_card_update_log{
+  id int [pk,increment]
+  punch_card_id int [ref: > punch_card.id]
+  reason text
+  updated_at datetime
+  updater_id int [ref:> User.id]
+  modified_data JSON
+}
+
+Table punch_card_type{
+  id int [pk, increment, ref: < punch_card.punch_card_type_id]
+  name varchar
+  in_out in_out //repensar nombre y si es enum o no
+}
+
+Enum in_out{
+  in
+  out
+}
+
+
+Table leave_type{
+  id int [pk, increment]
+  name varchar
+  description text
+  type type
+  allowed_days_rules_id int [ref: < allowed_days_rules.id]
+}
+
+
+ type {
+  ordinary
+  extraordinary
+  absence_excuse
+}
+
+Table allowed_days_rules{
+  id int [pk, increment]
+  date_type date_type
+  number_of_days tinyint
+  scope allowed_days_scope
+}
+
+
+ date_type{
+  working_day
+  business_day
+  calendar_day
+}
+
+Enum allowed_days_scope{
+  by_year
+  by_month
+  by_decade
+  by_leave
+}
+
+
+
+Table leave_movement {
+  id int [pk, increment]
+  leave_type_id int [ref: >  "leave_type"."id"]
+  request text
+  employee_id int [ref: > employee.id]
+  leave_movement_status_id int [ref: > leave_movement_status.id]
+  leave_movement_depedency_id int [ref: - leave_movement.id, null]
+}
+
+Table leave_movement_status{
+  id int [pk,increment]
+  status status
+  updated_at datetime
+  reason text
+  updater_id int [ref: > User.id]
+}
+
+Enum status{
+  accepted
+  pending
+  rejected
+}
+
+Table justification_file {
+  id int [PK, increment]
+  leave_movement_id int [ref: > leave_movement.id]
+  name varchar
+  mimetype varchar
+  content longblob //binarios largos
+}
+
+Table workshift{
+  id int [pk, increment]
+  branch_office_id int [ref: < branch_office.id]
+  name varchar
+  modality_id int [ref: < modality.id]
+}
+
+Table modality {
+  id int [pk, increment]
+  name varchar
+}
+
+Table shift_override{
+  id int [pk, increment]
+  branch_office_id int
+  employee_id int [ref: < employee.id]
+  workshift_schedule_id int [ref: > shift_schedule.id]
+}
+
+Table shift_schedule {
+  id int [pk, increment]
+  workshift_id int [ref: < workshift.id]
+  date_from date [null]
+  date_to date [null]
+  days_of_week varchar //ej. 135 (lunes,miercoles y viernes)
+  in_time time [null]
+  out_time time [null]
+  working_time time [null]
+  icon blob
+}
+//varias cuentas o no??
+
+
+//mongo quizas
+Table census_data {
+  id int [pk, increment]
+  data_value varchar
+  census_data_type_id int [ref: < census_data_type.id]
+  person_id int [ref: < person.id]
+}
+
+Table census_data_type {
+  id int [pk, increment]
+  name varchar //ej.email
+  min_limit int
+  max_limit int
+  value_type varchar
+  alowed_values varchar [note:"expresión regular"]
+}
+
+Table company_data{
+  id int [pk, increment]
+  data_value varchar
+  company_data_type_id int [ref: < company_data_type.id]
+  company_id int [ref: < company.id]
+}
+
+Table company_data_type {
+  id int [pk, increment]
+  name varchar
+  min_limit int
+  max_limit int
+  data_type varchar
+  alowed_values varchar [note:"expresión regular"]
+}
+
+Table country {
+  code varchar [pk, note:"ISO 3166 Country Codes, alpha 2 o 3 digitos"]
+  name varchar
+}
+
+
+Table holiday [note:"sql o nosql? API pjnovas.gitbooks.io/no-laborables/content/feriados---mensual.html "] {
+  id int [pk, increment]
+  date date
+  country_code varchar [null, ref: < country.code]
+  reason varchar
+  type holiday_type //inamovible | trasladable | nolaborable | puente
+}
+
+
+Table holiday_company{
+  holiday_id int [ref: < holiday.id]
+  company_id int [ref: < company.id]
+}
+
+Table holiday_branch_office{
+  holiday_id int [ref: < holiday.id]
+  branch_office_id int [ref: < branch_office.id]
+}
+
+Table group {
+  id int [pk]
+  name varchar
+  company_id int [null, ref: < company.id]
+  branch_office_id int [null,ref: < branch_office.id]
+}
+
+Table group_overseer {
+  group_id int [pk, ref: - group.id]
+  person_id int [pk, ref: - person.id]
+}
+
+Table group_cost_center{
+  group_id int [pk, ref: - group.id]
+  cost_center_id int [pk, ref: - cost_center.id]
+}
+
+
+Table punch_card_image {
+  id int [PK, increment]
+  punch_card_id int [ref: > punch_card.id]
+  mimetype varchar
+  content longblob //binarios largos
+}
+
+Table employee_group {
+  employee_id int [ref: > employee.id]
+  group_id int [ref: > group.id]
+}
+
+
+Table api_token {
+  api_token_id int [PK]
+  secret varchar
+  user_id int [ref: > User.id]
+
+}
+
+Table place {
+  id int [PK, increment]
+  latitude float
+  longitude float
+  name varchar
+  address varchar
+  company_id int [ref: > company.id]
+}
+
+Table company_client_company {
+  company_id int [ref: > company.id]
+  client_company_id int [ref: > company.id]
+}
+
+
+Table device {
+  id int [PK]
+  name varchar
+  alias varchar
+
+}
+
+Table employee_device {
+  device_id int [ref: > device.id]
+  employee_id int [ref: > employee.id]
+}
+

@@ -1,0 +1,73 @@
+#!/bin/bash
+source ./backend-api-laravel/.env
+envContainerName=laravel-env
+vueContainerName=vue
+dockerComposeOpts="-f docker-compose.yml -f docker-compose.utils.yml"
+
+usage() {
+  echo "Este script se usa para inicializar docker-composer completo, con todos los archivos de configuración (con utils), frenar o rebuildear sume"
+  echo Modo de uso:
+  echo "$0 <COMMAND>"
+  echo ""
+  echo "COMMAND:"
+  echo "    up                 : inicia los contenedores de docker-compose"
+  echo "    down               : frena y borra los contenedores de docker-compose"
+  echo "    status             : determina si sume está siendo ejecutado (usando el contenedor $envContainerName)"
+  echo "    logs               : muestra logs del docker-compose completo (puede pasarse -f y el nombre del contenedor)"
+  echo "    build              : ejecuta las secuencias de construcción del proyecto (composer, npm, migraciones)"
+  echo "    clean              : elimina desde el contenedor $envContainerName los archivos generados por build"
+  echo "    bash               : inicia la terminal interactiva de bash del contenedor $envContainerName"
+  echo "    test               : ejecuta los test unitarios de sume en el contenedor $envContainerName"
+  echo "    composer-update    : ejecuta 'composer update' de sume en el contenedor $envContainerName"
+  echo "    vue-install        : ejecuta 'yarn install' de sume en el contenedor node ($vueContainerName)"
+  echo "    vue-yarn-add       : agrega un paquete de yarn 'yarn add <nombre-paquete>' en el contenedor node ($vueContainerName)"
+}
+
+case $1 in
+    "up")
+        docker-compose $dockerComposeOpts up -d
+        ;;
+    "down")
+        docker-compose $dockerComposeOpts down
+        ;;
+    "status")
+        if [ -z `docker-compose $dockerComposeOpts ps -q $envContainerName` ] || [ -z `docker ps -q --no-trunc | grep $(docker-compose $dockerComposeOpts ps -q $envContainerName)` ]; then
+          echo "Not running."
+        else
+          echo "Running."
+        fi
+        ;;
+    "logs")
+        docker-compose $dockerComposeOpts logs $2 $3
+        ;;
+    "build")
+        docker-compose $dockerComposeOpts run $vueContainerName yarn install
+        docker-compose $dockerComposeOpts run $envContainerName ../dockerfiles/bin/prj-env-build.sh
+        ;;
+    "clean")
+            docker-compose $dockerComposeOpts run $envContainerName ../dockerfiles/bin/prj-env-clean.sh
+            docker-compose $dockerComposeOpts run $vueContainerName sh ../dockerfiles/bin/prj-vue-clean.sh
+            sudo rm -rf data/
+            ;;
+    "composer-update")
+        docker-compose $dockerComposeOpts run $envContainerName composer update
+        ;;
+    "vue-install")
+        docker-compose $dockerComposeOpts run $vueContainerName yarn install
+        ;;
+    "vue-yarn-add")
+        docker-compose $dockerComposeOpts run $vueContainerName yarn add $2
+        ;;
+    "node-install")
+        docker-compose $dockerComposeOpts run $vueContainerName yarn install
+        ;;
+    "test")
+        docker-compose $dockerComposeOpts run $envContainerName vendor/bin/phpunit
+        ;;
+    "bash")
+        docker-compose $dockerComposeOpts exec $envContainerName bash
+        ;;
+    *)
+        usage
+        ;;
+esac

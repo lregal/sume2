@@ -1,0 +1,68 @@
+{
+    "name": "vue-crud",
+    "version": "0.15.2",
+    "description": "Vue CRUD",
+    "author": "Szczepan Masny <szczepanmasny@gmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
+        "docs:build": "node docs.js && vuepress build docs",
+        "docs:dev": "node docs.js && vuepress dev docs",
+        "test:unit": "vue-cli-service test:unit"
+    },
+    "dependencies": {
+        "babel-polyfill": "^6.26.0",
+        "file-saver": "^2.0.5",
+        "moment-timezone": "^0.5.33",
+        "register-service-worker": "^1.7.2",
+        "tiptap-vuetify": "^2.24.0",
+        "vue": "^2.6.12",
+        "vue-i18n": "^8.22.4",
+        "vue-resource": "^1.5.1",
+        "vue-router": "^3.5.1",
+        "vuetify": "^2.4.3",
+        "vuetify-datetime-picker": "^2.1.1",
+        "vuetify-google-autocomplete": "^2.0.4",
+        "vuex": "^3.6.2",
+        "xlsx": "^0.14.1"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "^3.2.0",
+        "@vue/cli-plugin-eslint": "^3.8.0",
+        "@vue/cli-plugin-pwa": "^3.8.0",
+        "@vue/cli-plugin-unit-jest": "^3.8.0",
+        "@vue/cli-service": "^3.2.0",
+        "@vue/eslint-config-standard": "^4.0.0",
+        "@vue/test-utils": "1.0.0-beta.29",
+        "@vuepress/plugin-google-analytics": "^1.8.0",
+        "@vuepress/plugin-pwa": "^1.8.0",
+        "babel-core": "7.0.0-bridge.0",
+        "babel-eslint": "^10.1.0",
+        "babel-jest": "^24.8.0",
+        "eslint": "^5.16.0",
+        "eslint-plugin-vue": "^5.0.0",
+        "fs-extra": "^7.0.1",
+        "material-design-icons-iconfont": "^5.0.1",
+        "sass": "^1.32.5",
+        "sass-loader": "^7.1.0",
+        "script-loader": "^0.7.2",
+        "stylus": "^0.54.8",
+        "stylus-loader": "^3.0.2",
+        "vue-cli-plugin-vuetify": "^0.6.3",
+        "vue-template-compiler": "^2.6.12",
+        "vuepress": "^1.8.0",
+        "vuetify-loader": "^1.7.1"
+    },
+    "postcss": {
+        "plugins": {
+            "autoprefixer": {}
+        }
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not ie <= 8"
+    ]
+}

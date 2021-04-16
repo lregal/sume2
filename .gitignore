@@ -1,0 +1,16 @@
+#docker-composer volumes
+data/
+
+# IDE exclusions
+.DS_Store
+Thumbs.db
+.idea
+_ide_helper.php
+.phpstorm.meta.php
+*.sqlite
+.rocketeer/
+.env.testing
+.vscode
+.phpunit.result.cache
+
+package-lock.json

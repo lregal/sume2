@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Models\Leaves;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class LeaveAllowedDaysRule extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'days_type',
+        'number_of_days',
+        'rule_scope',
+        'active',
+    ];
+
+}

@@ -1,0 +1,17 @@
+export default {
+  updated: 'Actualizado',
+  updateError: 'Error! No se pudo actualizar',
+  stored: 'Guardado',
+  storeError: 'Error! No se pudo guardar',
+  suspended: 'Suspendido',
+  suspendError: 'Error! No se pudo suspender',
+  restored: 'Restaurado',
+  restoreError: 'Error! No se pudo restaurar',
+  deleted: 'Eliminado',
+  deleteError: 'Error! No se pudo elminiar',
+  added: 'Agregado',
+  addError: 'Error! No se pudo agregar',
+  removed: 'Quitado',
+  removeError: 'Error! No se pudo quitar',
+  confirm: '¿Está seguro?',
+}
